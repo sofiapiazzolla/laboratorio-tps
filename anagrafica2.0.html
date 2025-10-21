@@ -1,0 +1,82 @@
+<!DOCTYPE html> 
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Anagrafica Utente</title>
+
+  <script>
+    function stampa() {
+
+      var datiUtente = [
+        document.getElementById("nome").value,
+        document.getElementById("cognome").value,
+        document.getElementById("indirizzo").value,
+        document.getElementById("citta").value,
+        document.getElementById("cap").value,
+        document.getElementById("nascita").value
+      ];
+
+      var annoNascita = parseInt(datiUtente[5]);
+      var generazione = "";
+
+      switch (true) {
+        case (annoNascita >= 1901 && annoNascita <= 1927):
+          generazione = "Greatest Generation";
+          break;
+        case (annoNascita >= 1928 && annoNascita <= 1945):
+          generazione = "Generazione Silenziosa";
+          break;
+        case (annoNascita >= 1946 && annoNascita <= 1964):
+          generazione = "Baby Boomers";
+          break;
+        case (annoNascita >= 1965 && annoNascita <= 1980):
+          generazione = "Generazione X";
+          break;
+        case (annoNascita >= 1981 && annoNascita <= 1996):
+          generazione = "Millennials";
+          break;
+        case (annoNascita >= 1997 && annoNascita <= 2012):
+          generazione = "Generazione Z";
+          break;
+        case (annoNascita >= 2013):
+          generazione = "Generazione Alpha";
+          break;
+        default:
+          generazione = "Anno non valido";
+      }
+
+      document.getElementById("dest").style.display = "block";
+
+      document.getElementById("dest").innerHTML =
+        "<h3>Dati Inseriti:</h3>" +
+        "Nome: " + datiUtente[0] + "<br>" +
+        "Cognome: " + datiUtente[1] + "<br>" +
+        "Indirizzo: " + datiUtente[2] + "<br>" +
+        "Città: " + datiUtente[3] + "<br>" +
+        "CAP: " + datiUtente[4] + "<br>" +
+        "Anno di nascita: " + annoNascita + "<br>" +
+        "Appartiene alla: <b>" + generazione + "</b>";
+    }
+  </script>
+</head>
+
+<body style="display: flex; justify-content: space-between;">
+
+ 
+  <div style="width:45%;">
+    <h2>Inserisci i tuoi dati</h2>
+    <input type="text" id="nome" placeholder="Nome"><br>
+    <input type="text" id="cognome" placeholder="Cognome"><br>
+    <input type="text" id="indirizzo" placeholder="Indirizzo"><br>
+    <input type="text" id="citta" placeholder="Città"><br>
+    <input type="text" id="cap" placeholder="CAP"><br>
+    <input type="text" id="nascita" placeholder="Anno di nascita (es. 2005)"><br><br>
+    <input type="button" value="OK" onclick="stampa()">
+  </div>
+
+ 
+  <div id="dest" style="display:none; width:45%; border:1px solid black; padding:10px;"></div>
+
+</body>
+</html>
+
