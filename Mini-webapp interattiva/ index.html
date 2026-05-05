@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orbit Dash | La tua dashboard personale</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="light-theme">
+    <header>
+        <nav class="container">
+            <div class="logo">Orbit<span>Dash</span></div>
+            <button class="menu-toggle" aria-label="Apri menu" aria-expanded="false">
+                <span class="hamburger"></span>
+            </button>
+            <ul class="nav-links">
+                <li><a href="#home" class="active">Home</a></li>
+                <li><a href="#tasks">Attività</a></li>
+                <li><a href="#stats">Statistiche</a></li>
+                <li><button id="theme-switch" aria-label="Cambia tema">🌙</button></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="container">
+        <section id="home" class="view">
+            <header class="section-header">
+                <h1>Bentornato, <span id="user-name">Utente</span></h1>
+                <p>Ecco il riepilogo dei tuoi progressi odierni.</p>
+            </header>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>Focus</h3>
+                    <p class="stat-value" id="task-count">0</p>
+                    <p>Attività rimaste</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Completati</h3>
+                    <p class="stat-value" id="completed-count">0</p>
+                    <p>Obiettivi raggiunti</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="tasks" class="view hidden">
+            <header class="section-header">
+                <h2>Le tue Attività</h2>
+                <div class="controls">
+                    <input type="text" id="search-task" placeholder="Cerca attività..." aria-label="Cerca tra i task">
+                    <select id="filter-priority" aria-label="Filtra per priorità">
+                        <option value="all">Tutte le priorità</option>
+                        <option value="high">Alta</option>
+                        <option value="medium">Media</option>
+                        <option value="low">Bassa</option>
+                    </select>
+                </div>
+            </header>
+
+            <form id="add-task-form" class="task-form">
+                <div class="input-group">
+                    <input type="text" id="task-input" placeholder="Cosa devi fare?" required minlength="3">
+                    <select id="priority-input" required>
+                        <option value="low">Bassa</option>
+                        <option value="medium" selected>Media</option>
+                        <option value="high">Alta</option>
+                    </select>
+                    <button type="submit" class="btn-primary">Aggiungi</button>
+                </div>
+                <span class="error-msg" id="task-error"></span>
+            </form>
+
+            <ul id="task-list" class="task-list">
+                </ul>
+        </section>
+    </main>
+
+    <div id="modal-overlay" class="modal-overlay hidden" role="dialog" aria-modal="true">
+        <div class="modal-content">
+            <button class="close-modal" aria-label="Chiudi">&times;</button>
+            <h3 id="modal-title">Dettaglio Task</h3>
+            <div id="modal-body"></div>
+        </div>
+    </div>
+
+    <div id="toast-container" class="toast-container"></div>
+
+    <footer>
+        <p>&copy; 2024 OrbitDash - Realizzato per scopo didattico</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
