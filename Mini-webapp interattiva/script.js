@@ -1,69 +1,103 @@
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-}
-
-.nav {
-  display: flex;
-  justify-content: space-between;
-  background: #2563eb;
-  color: white;
-  padding: 1rem;
-}
-
-.nav a {
-  color: white;
-  margin-left: 1rem;
-  text-decoration: none;
-}
-
-.hero {
-  text-align: center;
-  padding: 4rem 1rem;
-}
-
-.cta {
-  background: #2563eb;
-  color: white;
-  padding: 10px 20px;
-  border-radius: 8px;
-  text-decoration: none;
-}
-
-.section {
-  padding: 1rem;
-}
-
-.grid {
-  display: grid;
-  gap: 1rem;
-}
-
-.card {
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  padding: 1rem;
-}
-
-.card img {
-  width: 100%;
-  height: 180px;
-  object-fit: cover;
-  border-radius: 8px;
-}
-
-.card button {
-  margin-top: 10px;
-}
-
-@media (min-width: 768px) {
-  .grid {
-    grid-template-columns: repeat(2, 1fr);
+const products = [
+  {
+    id: 1,
+    name: "Laptop Pro",
+    price: 1200,
+    desc: "Potente laptop",
+    img: "https://via.placeholder.com/300x200?text=Laptop"
+  },
+  {
+    id: 2,
+    name: "Smartphone X",
+    price: 800,
+    desc: "Telefono avanzato",
+    img: "https://via.placeholder.com/300x200?text=Phone"
+  },
+  {
+    id: 3,
+    name: "Tablet Air",
+    price: 600,
+    desc: "Tablet leggero",
+    img: "https://via.placeholder.com/300x200?text=Tablet"
   }
+];
+
+let favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+
+const productList = document.getElementById("productList");
+const favoritesList = document.getElementById("favoritesList");
+
+function createCard(p) {
+  const card = document.createElement("div");
+  card.className = "card";
+
+  const img = document.createElement("img");
+  img.src = p.img;
+  img.alt = p.name;
+
+  const title = document.createElement("h3");
+  title.textContent = p.name;
+
+  const price = document.createElement("p");
+  price.textContent = `€${p.price}`;
+
+  const btn = document.createElement("button");
+  btn.textContent = favorites.includes(p.id) ? "Rimuovi" : "Preferito";
+
+  btn.onclick = () => {
+    if (favorites.includes(p.id)) {
+      favorites = favorites.filter(f => f !== p.id);
+    } else {
+      favorites.push(p.id);
+    }
+    localStorage.setItem("favorites", JSON.stringify(favorites));
+    location.reload();
+  };
+
+  card.append(img, title, price, btn);
+  return card;
 }
 
-@media (min-width: 1024px) {
-  .grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
+function renderProducts(list) {
+  productList.innerHTML = "";
+  list.forEach(p => {
+    productList.appendChild(createCard(p));
+  });
+}
+
+function renderFavorites() {
+  const favProducts = products.filter(p => favorites.includes(p.id));
+  favProducts.forEach(p => {
+    favoritesList.appendChild(createCard(p));
+  });
+}
+
+if (productList) {
+  renderProducts(products);
+
+  const searchInput = document.getElementById("searchInput");
+  const sortSelect = document.getElementById("sortSelect");
+
+  searchInput?.addEventListener("input", () => {
+    const value = searchInput.value.toLowerCase();
+    const filtered = products.filter(p =>
+      p.name.toLowerCase().includes(value)
+    );
+    renderProducts(filtered);
+  });
+
+  sortSelect?.addEventListener("change", () => {
+    let sorted = [...products];
+    if (sortSelect.value === "name") {
+      sorted.sort((a, b) => a.name.localeCompare(b.name));
+    }
+    if (sortSelect.value === "price") {
+      sorted.sort((a, b) => a.price - b.price);
+    }
+    renderProducts(sorted);
+  });
+}
+
+if (favoritesList) {
+  renderFavorites();
 }
