@@ -1,103 +1,117 @@
-const products = [
-  {
-    id: 1,
-    name: "Laptop Pro",
-    price: 1200,
-    desc: "Potente laptop",
-    img: "https://via.placeholder.com/300x200?text=Laptop"
-  },
-  {
-    id: 2,
-    name: "Smartphone X",
-    price: 800,
-    desc: "Telefono avanzato",
-    img: "https://via.placeholder.com/300x200?text=Phone"
-  },
-  {
-    id: 3,
-    name: "Tablet Air",
-    price: 600,
-    desc: "Tablet leggero",
-    img: "https://via.placeholder.com/300x200?text=Tablet"
-  }
-];
+// STATE MANAGEMENT
+let tasks = JSON.parse(localStorage.getItem('orbit_tasks')) || [];
 
-let favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+// DOM ELEMENTS
+const taskList = document.getElementById('task-list');
+const taskForm = document.getElementById('add-task-form');
+const themeBtn = document.getElementById('theme-switch');
+const modal = document.getElementById('modal-overlay');
 
-const productList = document.getElementById("productList");
-const favoritesList = document.getElementById("favoritesList");
+// 1. TEMA DARK/LIGHT PERSISTENTE
+themeBtn.addEventListener('click', () => {
+    document.body.classList.toggle('dark-theme');
+    const isDark = document.body.classList.contains('dark-theme');
+    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    themeBtn.textContent = isDark ? '☀️' : '🌙';
+});
 
-function createCard(p) {
-  const card = document.createElement("div");
-  card.className = "card";
+// Carica tema salvato
+if (localStorage.getItem('theme') === 'dark') {
+    document.body.classList.add('dark-theme');
+    themeBtn.textContent = '☀️';
+}
 
-  const img = document.createElement("img");
-  img.src = p.img;
-  img.alt = p.name;
+// 2. RENDER TASK CON FILTRI E SANIFICAZIONE
+function renderTasks(filter = 'all', search = '') {
+    taskList.innerHTML = '';
+    
+    const filtered = tasks.filter(t => {
+        const matchesFilter = filter === 'all' || t.priority === filter;
+        const matchesSearch = t.text.toLowerCase().includes(search.toLowerCase());
+        return matchesFilter && matchesSearch;
+    });
 
-  const title = document.createElement("h3");
-  title.textContent = p.name;
+    filtered.forEach(task => {
+        const li = document.createElement('li');
+        li.className = 'task-item';
+        // Uso textContent per evitare XSS
+        const span = document.createElement('span');
+        span.textContent = task.text;
+        
+        const btn = document.createElement('button');
+        btn.textContent = 'Dettagli';
+        btn.onclick = () => openModal(task);
+        
+        li.append(span, btn);
+        taskList.appendChild(li);
+    });
+    updateStats();
+}
 
-  const price = document.createElement("p");
-  price.textContent = `€${p.price}`;
-
-  const btn = document.createElement("button");
-  btn.textContent = favorites.includes(p.id) ? "Rimuovi" : "Preferito";
-
-  btn.onclick = () => {
-    if (favorites.includes(p.id)) {
-      favorites = favorites.filter(f => f !== p.id);
-    } else {
-      favorites.push(p.id);
+// 3. VALIDAZIONE FORM E AGGIUNTA
+taskForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const input = document.getElementById('task-input');
+    const priority = document.getElementById('priority-input');
+    
+    if (input.value.trim().length < 3) {
+        showToast("Il testo deve avere almeno 3 caratteri", "error");
+        return;
     }
-    localStorage.setItem("favorites", JSON.stringify(favorites));
-    location.reload();
-  };
 
-  card.append(img, title, price, btn);
-  return card;
+    const newTask = {
+        id: Date.now(),
+        text: input.value,
+        priority: priority.value,
+        date: new Date().toLocaleDateString()
+    };
+
+    tasks.push(newTask);
+    saveAndRender();
+    input.value = '';
+    showToast("Task aggiunto con successo!");
+});
+
+// 4. MODALE CON CHIUSURA ESC/CLICK OUT
+function openModal(task) {
+    document.getElementById('modal-body').textContent = `Priorità: ${task.priority} - Creato il: ${task.date}`;
+    document.getElementById('modal-title').textContent = task.text;
+    modal.classList.remove('hidden');
 }
 
-function renderProducts(list) {
-  productList.innerHTML = "";
-  list.forEach(p => {
-    productList.appendChild(createCard(p));
-  });
+window.addEventListener('keydown', (e) => { if(e.key === 'Escape') modal.classList.add('hidden'); });
+modal.addEventListener('click', (e) => { if(e.target === modal) modal.classList.add('hidden'); });
+document.querySelector('.close-modal').onclick = () => modal.classList.add('hidden');
+
+// 5. TOAST NOTIFICATIONS
+function showToast(msg, type = "success") {
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.textContent = msg;
+    document.getElementById('toast-container').appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
 }
 
-function renderFavorites() {
-  const favProducts = products.filter(p => favorites.includes(p.id));
-  favProducts.forEach(p => {
-    favoritesList.appendChild(createCard(p));
-  });
+// UTILS
+function saveAndRender() {
+    localStorage.setItem('orbit_tasks', JSON.stringify(tasks));
+    renderTasks();
 }
 
-if (productList) {
-  renderProducts(products);
-
-  const searchInput = document.getElementById("searchInput");
-  const sortSelect = document.getElementById("sortSelect");
-
-  searchInput?.addEventListener("input", () => {
-    const value = searchInput.value.toLowerCase();
-    const filtered = products.filter(p =>
-      p.name.toLowerCase().includes(value)
-    );
-    renderProducts(filtered);
-  });
-
-  sortSelect?.addEventListener("change", () => {
-    let sorted = [...products];
-    if (sortSelect.value === "name") {
-      sorted.sort((a, b) => a.name.localeCompare(b.name));
-    }
-    if (sortSelect.value === "price") {
-      sorted.sort((a, b) => a.price - b.price);
-    }
-    renderProducts(sorted);
-  });
+function updateStats() {
+    document.getElementById('task-count').textContent = tasks.length;
 }
 
-if (favoritesList) {
-  renderFavorites();
-}
+// Navigazione SPA-like semplice
+document.querySelectorAll('.nav-links a').forEach(link => {
+    link.onclick = (e) => {
+        e.preventDefault();
+        document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
+        document.querySelector(link.getAttribute('href')).classList.remove('hidden');
+        document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+        link.classList.add('active');
+    };
+});
+
+// Init
+renderTasks();
