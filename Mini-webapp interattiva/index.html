@@ -1,94 +1,125 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Orbit Dash | La tua dashboard personale</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>EventFlow</title>
+
+  <link rel="stylesheet" href="style.css" />
 </head>
-<body class="light-theme">
-    <header>
-        <nav class="container">
-            <div class="logo">Orbit<span>Dash</span></div>
-            <button class="menu-toggle" aria-label="Apri menu" aria-expanded="false">
-                <span class="hamburger"></span>
-            </button>
-            <ul class="nav-links">
-                <li><a href="#home" class="active">Home</a></li>
-                <li><a href="#tasks">Attività</a></li>
-                <li><a href="#stats">Statistiche</a></li>
-                <li><button id="theme-switch" aria-label="Cambia tema">🌙</button></li>
-            </ul>
-        </nav>
-    </header>
 
-    <main class="container">
-        <section id="home" class="view">
-            <header class="section-header">
-                <h1>Bentornato, <span id="user-name">Utente</span></h1>
-                <p>Ecco il riepilogo dei tuoi progressi odierni.</p>
-            </header>
-            
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <h3>Focus</h3>
-                    <p class="stat-value" id="task-count">0</p>
-                    <p>Attività rimaste</p>
-                </div>
-                <div class="stat-card">
-                    <h3>Completati</h3>
-                    <p class="stat-value" id="completed-count">0</p>
-                    <p>Obiettivi raggiunti</p>
-                </div>
-            </div>
-        </section>
+<body>
+  <header class="header">
+    <nav class="navbar">
 
-        <section id="tasks" class="view hidden">
-            <header class="section-header">
-                <h2>Le tue Attività</h2>
-                <div class="controls">
-                    <input type="text" id="search-task" placeholder="Cerca attività..." aria-label="Cerca tra i task">
-                    <select id="filter-priority" aria-label="Filtra per priorità">
-                        <option value="all">Tutte le priorità</option>
-                        <option value="high">Alta</option>
-                        <option value="medium">Media</option>
-                        <option value="low">Bassa</option>
-                    </select>
-                </div>
-            </header>
+      <h1 class="logo">EventFlow</h1>
 
-            <form id="add-task-form" class="task-form">
-                <div class="input-group">
-                    <input type="text" id="task-input" placeholder="Cosa devi fare?" required minlength="3">
-                    <select id="priority-input" required>
-                        <option value="low">Bassa</option>
-                        <option value="medium" selected>Media</option>
-                        <option value="high">Alta</option>
-                    </select>
-                    <button type="submit" class="btn-primary">Aggiungi</button>
-                </div>
-                <span class="error-msg" id="task-error"></span>
-            </form>
+      <button class="menu-btn" aria-label="Apri menu">
+        ☰
+      </button>
 
-            <ul id="task-list" class="task-list">
-                </ul>
-        </section>
-    </main>
+      <ul class="nav-links">
+        <li><a href="#home">Home</a></li>
+        <li><a href="#events">Eventi</a></li>
+        <li><a href="#profile">Profilo</a></li>
+      </ul>
 
-    <div id="modal-overlay" class="modal-overlay hidden" role="dialog" aria-modal="true">
-        <div class="modal-content">
-            <button class="close-modal" aria-label="Chiudi">&times;</button>
-            <h3 id="modal-title">Dettaglio Task</h3>
-            <div id="modal-body"></div>
-        </div>
+    </nav>
+  </header>
+
+  <main>
+
+    <!-- HERO -->
+    <section id="home" class="hero">
+      <h2>Agenda Eventi & Corsi</h2>
+      <p>Organizza i tuoi eventi preferiti.</p>
+
+      <button id="theme-toggle">
+        🌙 Tema
+      </button>
+    </section>
+
+    <!-- FILTRI -->
+    <section id="events" class="filters-section">
+
+      <div class="filters">
+
+        <input
+          type="text"
+          id="search"
+          placeholder="Cerca evento..."
+          aria-label="Cerca evento"
+        />
+
+        <select id="category-filter" aria-label="Filtra categoria">
+          <option value="all">Tutte</option>
+          <option value="Design">Design</option>
+          <option value="Development">Development</option>
+          <option value="Marketing">Marketing</option>
+        </select>
+
+        <select id="sort-filter" aria-label="Ordina eventi">
+          <option value="default">Ordina</option>
+          <option value="name">Nome</option>
+          <option value="date">Data</option>
+        </select>
+
+        <button id="reset-btn">
+          Reset
+        </button>
+
+      </div>
+
+      <!-- EVENTI -->
+      <div class="events-grid" id="events-container"></div>
+
+      <div class="load-more-container">
+        <button id="load-more-btn">
+          Carica altri
+        </button>
+      </div>
+
+    </section>
+
+    <!-- PROFILO -->
+    <section id="profile" class="profile-section">
+
+      <h2>I tuoi preferiti</h2>
+
+      <div id="favorites-container"></div>
+
+    </section>
+
+  </main>
+
+  <!-- MODALE -->
+  <div class="modal hidden" id="modal">
+
+    <div class="modal-content">
+
+      <button class="close-modal" id="close-modal">
+        ✕
+      </button>
+
+      <h2 id="modal-title"></h2>
+
+      <p id="modal-date"></p>
+
+      <p id="modal-category"></p>
+
+      <button id="join-btn">
+        Iscriviti
+      </button>
+
     </div>
 
-    <div id="toast-container" class="toast-container"></div>
+  </div>
 
-    <footer>
-        <p>&copy; 2024 OrbitDash - Realizzato per scopo didattico</p>
-    </footer>
+  <!-- TOAST -->
+  <div id="toast" class="toast">
+    Evento salvato!
+  </div>
 
-    <script src="script.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
