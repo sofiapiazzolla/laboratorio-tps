@@ -1,284 +1,209 @@
-const events = [
-  {
-    id: 1,
-    title: "Web Design Bootcamp",
-    category: "Design",
-    date: "2026-06-12"
-  },
-
-  {
-    id: 2,
-    title: "JavaScript Masterclass",
-    category: "Development",
-    date: "2026-07-01"
-  },
-
-  {
-    id: 3,
-    title: "Digital Marketing",
-    category: "Marketing",
-    date: "2026-08-20"
-  },
-
-  {
-    id: 4,
-    title: "React Advanced",
-    category: "Development",
-    date: "2026-09-15"
-  },
-
-  {
-    id: 5,
-    title: "UX Design Basics",
-    category: "Design",
-    date: "2026-10-10"
-  }
+// Dati Mockati
+const eventsData = [
+    { id: 1, name: "Workshop React Advanced", date: "2026-06-15", category: "Tecnologia", desc: "Impara i segreti dei React Hooks e le performance." },
+    { id: 2, name: "Masterclass UI/UX", date: "2026-06-20", category: "Design", desc: "Principi fondamentali per un'interfaccia utente perfetta." },
+    { id: 3, name: "Marketing Digitale 2026", date: "2026-07-05", category: "Business", desc: "Strategie SEO e Social Media aggiornate." },
+    { id: 4, name: "Introduzione all'IA Generativa", date: "2026-07-12", category: "Tecnologia", desc: "Come integrare modelli LLM nelle tue app." }
 ];
 
-const eventsContainer = document.getElementById("events-container");
-const searchInput = document.getElementById("search");
-const categoryFilter = document.getElementById("category-filter");
-const sortFilter = document.getElementById("sort-filter");
-const resetBtn = document.getElementById("reset-btn");
-const modal = document.getElementById("modal");
-const closeModalBtn = document.getElementById("close-modal");
-const toast = document.getElementById("toast");
-const favoritesContainer = document.getElementById("favorites-container");
+// Stato
+let enrolledEvents = JSON.parse(localStorage.getItem('iscrizioni')) || [];
+let currentFilteredEvents = [...eventsData];
 
-const themeToggle = document.getElementById("theme-toggle");
+// DOM Elements
+const navLinks = document.querySelectorAll('.nav-links a');
+const sections = document.querySelectorAll('.view-section');
+const eventsGrid = document.getElementById('events-grid');
+const myEventsList = document.getElementById('my-events-list');
+const hamburger = document.querySelector('.hamburger');
+const navUl = document.querySelector('.nav-links');
+const themeToggle = document.getElementById('theme-toggle');
 
-const menuBtn = document.querySelector(".menu-btn");
-const navLinks = document.querySelector(".nav-links");
+const modal = document.getElementById('event-modal');
+const form = document.getElementById('enroll-form');
+const searchInput = document.getElementById('search-input');
+const categoryFilter = document.getElementById('category-filter');
 
-const loadMoreBtn = document.getElementById("load-more-btn");
+// 1. Tema Dark/Light
+const initTheme = () => {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark') {
+        document.body.setAttribute('data-theme', 'dark');
+    }
+};
 
-let visibleItems = 3;
-
-let favorites =
-  JSON.parse(localStorage.getItem("favorites")) || [];
-
-menuBtn.addEventListener("click", () => {
-  navLinks.classList.toggle("open");
+themeToggle.addEventListener('click', () => {
+    const isDark = document.body.getAttribute('data-theme') === 'dark';
+    if (isDark) {
+        document.body.removeAttribute('data-theme');
+        localStorage.setItem('theme', 'light');
+    } else {
+        document.body.setAttribute('data-theme', 'dark');
+        localStorage.setItem('theme', 'dark');
+    }
 });
 
-function renderEvents(list) {
+// 2. Navigazione SPA-like & Hamburger
+navLinks.forEach(link => {
+    link.addEventListener('click', (e) => {
+        e.preventDefault();
+        // Rimuovi active ovunque
+        navLinks.forEach(l => l.classList.remove('active'));
+        sections.forEach(s => s.classList.remove('active'));
+        
+        // Aggiungi active al target
+        e.target.classList.add('active');
+        const targetId = e.target.getAttribute('data-target');
+        document.getElementById(targetId).classList.add('active');
+        
+        // Chiudi menu mobile
+        navUl.classList.remove('show');
+        hamburger.setAttribute('aria-expanded', 'false');
 
-  if (!Array.isArray(list)) return;
-
-  eventsContainer.innerHTML = "";
-
-  list.slice(0, visibleItems).forEach(event => {
-
-    const card = document.createElement("article");
-
-    card.classList.add("card");
-
-    const title = document.createElement("h3");
-    title.textContent = event.title;
-
-    const category = document.createElement("p");
-    category.textContent = event.category;
-
-    const date = document.createElement("p");
-    date.textContent = event.date;
-
-    const detailsBtn = document.createElement("button");
-    detailsBtn.textContent = "Dettagli";
-
-    detailsBtn.addEventListener("click", () => {
-      openModal(event);
+        // Aggiorna vista se si va su Iscrizioni
+        if(targetId === 'my-events-section') renderMyEvents();
     });
+});
 
-    const favoriteBtn = document.createElement("button");
-    favoriteBtn.textContent = "Preferito";
+hamburger.addEventListener('click', () => {
+    const isExpanded = hamburger.getAttribute('aria-expanded') === 'true';
+    hamburger.setAttribute('aria-expanded', !isExpanded);
+    navUl.classList.toggle('show');
+});
 
-    favoriteBtn.addEventListener("click", () => {
-      addFavorite(event);
+document.getElementById('cta-events').addEventListener('click', () => {
+    document.querySelector('[data-target="events-section"]').click();
+});
+
+// 3. Funzione di supporto per creare elementi (Sicurezza: no innerHTML)
+const createEl = (tag, classNames = '', text = '') => {
+    const el = document.createElement(tag);
+    if (classNames) el.className = classNames;
+    if (text) el.textContent = text;
+    return el;
+};
+
+// 4. Renderizzazione Eventi
+const renderEvents = (eventsToRender, container, isMyEvents = false) => {
+    container.innerHTML = ''; // Svuota il contenitore
+    if (eventsToRender.length === 0) {
+        container.appendChild(createEl('p', '', 'Nessun evento trovato.'));
+        return;
+    }
+
+    eventsToRender.forEach(ev => {
+        const card = createEl('div', 'card');
+        card.appendChild(createEl('h3', '', ev.name));
+        card.appendChild(createEl('p', 'meta', `${ev.date} | ${ev.category}`));
+        
+        if (!isMyEvents) {
+            const btn = createEl('button', 'btn primary-btn', 'Vedi Dettagli');
+            btn.addEventListener('click', () => openModal(ev));
+            card.appendChild(btn);
+        } else {
+            card.appendChild(createEl('p', '', 'Sei iscritto a questo evento! ✅'));
+        }
+        
+        container.appendChild(card);
     });
+};
 
-    card.appendChild(title);
-    card.appendChild(category);
-    card.appendChild(date);
-    card.appendChild(detailsBtn);
-    card.appendChild(favoriteBtn);
+const renderMyEvents = () => {
+    const myEvents = eventsData.filter(ev => enrolledEvents.includes(ev.id));
+    renderEvents(myEvents, myEventsList, true);
+};
 
-    eventsContainer.appendChild(card);
+// 5. Ricerca e Filtri
+const applyFilters = () => {
+    const term = searchInput.value.toLowerCase();
+    const cat = categoryFilter.value;
+    
+    currentFilteredEvents = eventsData.filter(ev => {
+        const matchName = ev.name.toLowerCase().includes(term);
+        const matchCat = cat === 'all' || ev.category === cat;
+        return matchName && matchCat;
+    });
+    renderEvents(currentFilteredEvents, eventsGrid);
+};
 
-  });
-}
+searchInput.addEventListener('input', applyFilters);
+categoryFilter.addEventListener('change', applyFilters);
 
-renderEvents(events);
-
-function filterEvents() {
-
-  let filtered = [...events];
-
-  const searchValue =
-    searchInput.value.toLowerCase();
-
-  const categoryValue =
-    categoryFilter.value;
-
-  if (searchValue) {
-
-    filtered = filtered.filter(event =>
-      event.title
-        .toLowerCase()
-        .includes(searchValue)
-    );
-  }
-
-  if (categoryValue !== "all") {
-
-    filtered = filtered.filter(event =>
-      event.category === categoryValue
-    );
-  }
-
-  if (sortFilter.value === "name") {
-
-    filtered.sort((a, b) =>
-      a.title.localeCompare(b.title)
-    );
-  }
-
-  if (sortFilter.value === "date") {
-
-    filtered.sort((a, b) =>
-      new Date(a.date) - new Date(b.date)
-    );
-  }
-
-  renderEvents(filtered);
-}
-
-searchInput.addEventListener("input", filterEvents);
-
-categoryFilter.addEventListener("change", filterEvents);
-
-sortFilter.addEventListener("change", filterEvents);
-
-resetBtn.addEventListener("click", () => {
-
-  searchInput.value = "";
-
-  categoryFilter.value = "all";
-
-  sortFilter.value = "default";
-
-  renderEvents(events);
+document.getElementById('reset-filters').addEventListener('click', () => {
+    searchInput.value = '';
+    categoryFilter.value = 'all';
+    applyFilters();
 });
 
-function openModal(event) {
+// 6. Modale
+const openModal = (ev) => {
+    document.getElementById('modal-title').textContent = ev.name;
+    document.getElementById('modal-date').textContent = `${ev.date} | ${ev.category}`;
+    document.getElementById('modal-desc').textContent = ev.desc;
+    document.getElementById('modal-event-id').value = ev.id;
+    
+    // Reset form
+    form.reset();
+    document.querySelectorAll('.form-group').forEach(fg => fg.classList.remove('error'));
+    
+    modal.classList.add('open');
+    modal.setAttribute('aria-hidden', 'false');
+};
 
-  document.getElementById("modal-title").textContent =
-    event.title;
+const closeModal = () => {
+    modal.classList.remove('open');
+    modal.setAttribute('aria-hidden', 'true');
+};
 
-  document.getElementById("modal-date").textContent =
-    event.date;
+document.querySelector('.close-modal').addEventListener('click', closeModal);
+window.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+window.addEventListener('keydown', (e) => { if (e.key === 'Escape' && modal.classList.contains('open')) closeModal(); });
 
-  document.getElementById("modal-category").textContent =
-    event.category;
+// 7. Validazione Form e Toast
+const showToast = (message) => {
+    const container = document.getElementById('toast-container');
+    const toast = createEl('div', 'toast', message);
+    container.appendChild(toast);
+    setTimeout(() => { toast.remove(); }, 3000);
+};
 
-  modal.classList.remove("hidden");
-}
+form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    let isValid = true;
+    
+    const nameInput = document.getElementById('user-name');
+    const emailInput = document.getElementById('user-email');
+    
+    // Validate Name
+    if (!nameInput.value.trim()) {
+        nameInput.parentElement.classList.add('error');
+        isValid = false;
+    } else {
+        nameInput.parentElement.classList.remove('error');
+    }
+    
+    // Validate Email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(emailInput.value.trim())) {
+        emailInput.parentElement.classList.add('error');
+        isValid = false;
+    } else {
+        emailInput.parentElement.classList.remove('error');
+    }
 
-function closeModal() {
-  modal.classList.add("hidden");
-}
-
-closeModalBtn.addEventListener("click", closeModal);
-
-window.addEventListener("click", (e) => {
-
-  if (e.target === modal) {
-    closeModal();
-  }
+    if (isValid) {
+        const eventId = parseInt(document.getElementById('modal-event-id').value, 10);
+        if (!enrolledEvents.includes(eventId)) {
+            enrolledEvents.push(eventId);
+            localStorage.setItem('iscrizioni', JSON.stringify(enrolledEvents));
+            showToast('Iscrizione completata con successo!');
+        } else {
+            showToast('Sei già iscritto a questo evento.');
+        }
+        closeModal();
+    }
 });
 
-window.addEventListener("keydown", (e) => {
-
-  if (e.key === "Escape") {
-    closeModal();
-  }
-});
-
-function showToast(message) {
-
-  toast.textContent = message;
-
-  toast.classList.add("show");
-
-  setTimeout(() => {
-    toast.classList.remove("show");
-  }, 3000);
-}
-
-function addFavorite(event) {
-
-  const exists = favorites.some(fav => fav.id === event.id);
-
-  if (exists) {
-    showToast("Già nei preferiti");
-    return;
-  }
-
-  favorites.push(event);
-
-  localStorage.setItem(
-    "favorites",
-    JSON.stringify(favorites)
-  );
-
-  renderFavorites();
-
-  showToast("Aggiunto ai preferiti");
-}
-
-function renderFavorites() {
-
-  favoritesContainer.innerHTML = "";
-
-  favorites.forEach(event => {
-
-    const div = document.createElement("div");
-
-    div.classList.add("favorite-item");
-
-    const title = document.createElement("h4");
-    title.textContent = event.title;
-
-    div.appendChild(title);
-
-    favoritesContainer.appendChild(div);
-  });
-}
-
-renderFavorites();
-
-themeToggle.addEventListener("click", () => {
-
-  document.body.classList.toggle("dark");
-
-  const isDark =
-    document.body.classList.contains("dark");
-
-  localStorage.setItem(
-    "theme",
-    isDark ? "dark" : "light"
-  );
-});
-
-const savedTheme =
-  localStorage.getItem("theme");
-
-if (savedTheme === "dark") {
-  document.body.classList.add("dark");
-}
-
-loadMoreBtn.addEventListener("click", () => {
-
-  visibleItems += 3;
-
-  renderEvents(events);
-});
+// Inizializzazione
+initTheme();
+renderEvents(eventsData, eventsGrid);
