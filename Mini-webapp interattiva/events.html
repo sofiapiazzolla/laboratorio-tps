@@ -1,89 +1,75 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Collezione Eventi | FloraEvents</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calendario - Boutique Eventi & Corsi</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <header>
-        <div class="logo">🌸 FloraEvents</div>
-        <button class="hamburger" aria-label="Apri menu" aria-expanded="false">
-            <span></span>
-            <span></span>
-            <span></span>
-        </button>
-        <nav aria-label="Navigazione principale">
-            <ul class="nav-links">
-                <li><a href="index.html">Home</a></li>
-                <li><a href="events.html" class="active">Collezione Eventi</a></li>
-                <li><a href="diary.html">Il mio Diario</a></li>
-            </ul>
-            <button id="theme-toggle" aria-label="Cambia tema" title="Passa al tema Notte">🌙</button>
-        </nav>
-    </header>
+  <header>
+    <nav class="nav-container">
+      <a href="index.html" class="logo">Boutique Eventi</a>
+      <button class="hamburger" id="hamburger" aria-label="Apri menu">☰</button>
+      <ul class="nav-links" id="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="events.html" style="color: var(--accent-gold);">Calendario Eventi</a></li>
+        <li><a href="profile.html">La Mia Agenda</a></li>
+      </ul>
+    </nav>
+  </header>
 
-    <main class="fade-in">
-        <section id="events-section">
-            <h2 class="section-title">Collezione Eventi</h2>
-            <div class="filters">
-                <input type="text" id="search-input" placeholder="Cerca un'esperienza..." aria-label="Cerca eventi">
-                <select id="category-filter" aria-label="Filtra per categoria">
-                    <option value="all">Tutte le ispirazioni</option>
-                    <option value="Arte & Design">Arte & Design</option>
-                    <option value="Benessere">Benessere</option>
-                    <option value="Business">Business Femminile</option>
-                </select>
-                <button id="reset-filters" class="btn secondary-btn">Pulisci filtri</button>
-            </div>
-            <div id="events-grid" class="grid">
-                </div>
-        </section>
-    </main>
+  <main>
+    <h2>I Nostri Corsi ed Eventi</h2>
+    <p style="margin-bottom: 2rem;">Filtra e trova l'esperienza perfetta per te.</p>
 
-    <footer>
-        <p>Realizzato con 🤍 per spiriti creativi. &copy; 2026 FloraEvents.</p>
-    </footer>
+    <section class="controls">
+      <input type="text" id="search" placeholder="Cerca evento..." aria-label="Cerca evento">
+      
+      <select id="category" aria-label="Filtra per categoria">
+        <option value="all">Tutte le Categorie</option>
+        <option value="beauty">Beauty & Make-up</option>
+        <option value="creativita">Creatività & Arte</option>
+        <option value="wellness">Wellness & Benessere</option>
+      </select>
 
-    <div id="event-modal" class="modal" aria-hidden="true" role="dialog" aria-labelledby="modal-title">
-        <div class="modal-content">
-            <button class="close-modal" aria-label="Chiudi modale">&times;</button>
-            <div class="modal-header">
-                <span id="modal-icon" class="modal-icon"></span>
-                <h3 id="modal-title">Titolo Evento</h3>
-            </div>
-            <div class="modal-details-grid">
-                <p><strong>🗓 Data:</strong> <span id="modal-date"></span></p>
-                <p><strong>⏰ Orario:</strong> <span id="modal-time"></span></p>
-                <p><strong>📍 Luogo:</strong> <span id="modal-location"></span></p>
-                <p><strong>🎟 Prezzo:</strong> <span id="modal-price"></span></p>
-            </div>
-            <p id="modal-desc" class="modal-desc"></p>
-            
-            <form id="enroll-form" novalidate>
-                <h4 class="form-title">Riserva il tuo posto</h4>
-                <div class="form-group">
-                    <label for="user-name">Il tuo nome</label>
-                    <input type="text" id="user-name" placeholder="Es. Giulia Bianchi" required aria-describedby="name-error">
-                    <span class="error-msg" id="name-error">Per favore, inserisci il tuo nome.</span>
-                </div>
-                <div class="form-group">
-                    <label for="user-email">La tua email</label>
-                    <input type="email" id="user-email" placeholder="giulia@example.com" required aria-describedby="email-error">
-                    <span class="error-msg" id="email-error">Serve un'email valida per inviarti l'invito.</span>
-                </div>
-                <input type="hidden" id="modal-event-id">
-                <button type="submit" class="btn primary-btn btn-full">Conferma Prenotazione</button>
-            </form>
+      <select id="sort" aria-label="Ordina risultati">
+        <option value="date-asc">Data (Più vicini)</option>
+        <option value="date-desc">Data (Più lontani)</option>
+        <option value="name">Nome (A-Z)</option>
+      </select>
+    </section>
+
+    <section class="events-grid" id="events-grid" aria-live="polite">
+      </section>
+  </main>
+
+  <div class="modal-overlay" id="registration-modal" role="dialog" aria-modal="true" aria-labelledby="modal-event-title">
+    <div class="modal-content">
+      <button class="close-modal" aria-label="Chiudi modale">✖</button>
+      <h3 id="modal-event-title" style="margin-bottom: 1.5rem; text-align: center;">Iscrizione</h3>
+      <form id="registration-form" novalidate>
+        <div class="form-group">
+          <label for="user-name">Nome e Cognome</label>
+          <input type="text" id="user-name" placeholder="Es. Giulia Bianchi" required>
+          <span class="error-msg">Inserisci il tuo nome.</span>
         </div>
+        <div class="form-group">
+          <label for="user-email">Indirizzo Email</label>
+          <input type="email" id="user-email" placeholder="giulia@example.com" required>
+          <span class="error-msg">Inserisci un'email valida.</span>
+        </div>
+        <button type="submit" class="btn" style="width: 100%; margin-top: 1rem;">Conferma Iscrizione</button>
+      </form>
     </div>
+  </div>
 
-    <div id="toast-container" aria-live="polite"></div>
+  <div class="toast-container" id="toast-container"></div>
 
-    <script src="app.js"></script>
+  <footer>
+    <p>&copy; 2026 Boutique Eventi & Corsi.</p>
+  </footer>
+
+  <script src="app.js"></script>
 </body>
 </html>
