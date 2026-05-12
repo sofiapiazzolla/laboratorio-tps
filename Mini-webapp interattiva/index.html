@@ -3,92 +3,126 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Agenda Eventi & Corsi</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <title>Atelier Évènements | La tua agenda di stile</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body data-theme="light">
+
     <header>
-        <div class="logo">EventApp</div>
-        <button class="hamburger" aria-label="Apri menu" aria-expanded="false">
-            <span></span>
-            <span></span>
-            <span></span>
-        </button>
-        <nav aria-label="Navigazione principale">
-            <ul class="nav-links">
-                <li><a href="#" data-target="home-section" class="active">Home</a></li>
-                <li><a href="#" data-target="events-section">Tutti gli Eventi</a></li>
-                <li><a href="#" data-target="my-events-section">Le mie Iscrizioni</a></li>
-            </ul>
-            <button id="theme-toggle" aria-label="Cambia tema">🌓</button>
-        </nav>
+        <div class="header-container">
+            <div class="logo">
+                <span class="logo-text">Atelier <span class="accent">Évènements</span></span>
+            </div>
+            
+            <button class="hamburger" aria-label="Menu" aria-expanded="false">
+                <span></span><span></span><span></span>
+            </button>
+
+            <nav aria-label="Menu principale">
+                <ul class="nav-links">
+                    <li><a href="#" data-target="home-section" class="active">Home</a></li>
+                    <li><a href="#" data-target="explore-section">Esplora Corsi</a></li>
+                    <li><a href="#" data-target="profile-section">Area Personale</a></li>
+                </ul>
+                <div class="nav-actions">
+                    <button id="theme-btn" title="Cambia Atmosfera" aria-label="Cambia tema">✨</button>
+                </div>
+            </nav>
+        </div>
     </header>
 
     <main>
         <section id="home-section" class="view-section active">
-            <div class="hero">
-                <h1>Scopri e partecipa ai migliori eventi</h1>
-                <p>Migliora le tue competenze con i nostri corsi e seminari.</p>
-                <button class="btn primary-btn" id="cta-events">Sfoglia Eventi</button>
+            <div class="hero-feminine">
+                <div class="hero-content">
+                    <span class="hero-tag">Creatività • Benessere • Stile</span>
+                    <h1>Nutri la tua anima con <br><em>esperienze uniche.</em></h1>
+                    <p>Dallo yoga al tramonto ai workshop di ceramica: trova l'evento perfetto per te.</p>
+                    <button class="btn-floral" id="go-to-explore">Inizia a sognare</button>
+                </div>
             </div>
         </section>
 
-        <section id="events-section" class="view-section">
-            <h2>Catalogo Eventi</h2>
-            <div class="filters">
-                <input type="text" id="search-input" placeholder="Cerca per nome..." aria-label="Cerca eventi">
-                <select id="category-filter" aria-label="Filtra per categoria">
-                    <option value="all">Tutte le categorie</option>
-                    <option value="Tecnologia">Tecnologia</option>
-                    <option value="Design">Design</option>
-                    <option value="Business">Business</option>
-                </select>
-                <button id="reset-filters" class="btn secondary-btn">Reset</button>
+        <section id="explore-section" class="view-section">
+            <header class="section-header">
+                <h2>Catalogo Esperienze</h2>
+                <p id="event-counter">Caricamento eventi...</p>
+            </header>
+
+            <div class="filter-bar">
+                <div class="search-box">
+                    <input type="text" id="event-search" placeholder="Cerca un'ispirazione..." aria-label="Cerca eventi">
+                </div>
+                <div class="select-group">
+                    <select id="filter-cat" aria-label="Categoria">
+                        <option value="all">Tutte le Categorie</option>
+                        <option value="Creatività">Creatività</option>
+                        <option value="Wellness">Wellness</option>
+                        <option value="Cucina">Cucina</option>
+                        <option value="Business">Empowerment</option>
+                    </select>
+                    <select id="sort-order" aria-label="Ordina per">
+                        <option value="date-asc">Data: Prossimi eventi</option>
+                        <option value="name-asc">Nome: A-Z</option>
+                    </select>
+                </div>
+                <button id="reset-btn" class="btn-link">Pulisci filtri</button>
             </div>
-            <div id="events-grid" class="grid">
+
+            <div id="events-grid" class="grid-luxury">
                 </div>
         </section>
 
-        <section id="my-events-section" class="view-section">
-            <h2>Le mie Iscrizioni</h2>
-            <div id="my-events-list" class="grid">
+        <section id="profile-section" class="view-section">
+            <div class="profile-layout">
+                <aside class="profile-sidebar">
+                    <div class="user-avatar">✨</div>
+                    <h3>Bentornata, Cara</h3>
+                </aside>
+                <div class="profile-content">
+                    <div class="tabs">
+                        <button class="tab-btn active" data-tab="booked">Le mie Iscrizioni</button>
+                        <button class="tab-btn" data-tab="wishlist">I miei Preferiti ❤️</button>
+                    </div>
+                    <div id="tab-content" class="grid-luxury small">
+                        </div>
                 </div>
+            </div>
         </section>
     </main>
 
-    <footer>
-        <p>&copy; 2026 EventApp. Tutti i diritti riservati.</p>
-    </footer>
-
-    <div id="event-modal" class="modal" aria-hidden="true" role="dialog" aria-labelledby="modal-title">
-        <div class="modal-content">
-            <button class="close-modal" aria-label="Chiudi modale">&times;</button>
-            <h3 id="modal-title">Titolo Evento</h3>
-            <p id="modal-date" class="meta"></p>
-            <p id="modal-desc"></p>
-            
-            <form id="enroll-form" novalidate>
-                <h4>Iscriviti ora</h4>
-                <div class="form-group">
-                    <label for="user-name">Nome Completo *</label>
-                    <input type="text" id="user-name" required aria-describedby="name-error">
-                    <span class="error-msg" id="name-error">Inserisci il tuo nome.</span>
+    <div id="event-modal" class="modal-overlay" aria-hidden="true">
+        <div class="modal-card">
+            <button class="modal-close">&times;</button>
+            <div class="modal-body">
+                <div class="modal-image-placeholder" id="m-img"></div>
+                <div class="modal-info">
+                    <span id="m-cat" class="tag"></span>
+                    <h3 id="m-title"></h3>
+                    <p id="m-date" class="date-info"></p>
+                    <p id="m-desc"></p>
+                    
+                    <form id="booking-form" novalidate>
+                        <div class="input-group">
+                            <label for="f-name">Il tuo Nome</label>
+                            <input type="text" id="f-name" required placeholder="Es. Amélie">
+                            <span class="err-text" id="err-name">Per favore, dicci come ti chiami.</span>
+                        </div>
+                        <div class="input-group">
+                            <label for="f-email">Email di contatto</label>
+                            <input type="email" id="f-email" required placeholder="amelie@esempio.it">
+                            <span class="err-text" id="err-email">Inserisci un'email valida per ricevere l'invito.</span>
+                        </div>
+                        <input type="hidden" id="f-id">
+                        <button type="submit" class="btn-floral full">Conferma Iscrizione</button>
+                    </form>
                 </div>
-                <div class="form-group">
-                    <label for="user-email">Email *</label>
-                    <input type="email" id="user-email" required aria-describedby="email-error">
-                    <span class="error-msg" id="email-error">Inserisci un'email valida.</span>
-                </div>
-                <input type="hidden" id="modal-event-id">
-                <button type="submit" class="btn primary-btn">Conferma Iscrizione</button>
-            </form>
+            </div>
         </div>
     </div>
 
-    <div id="toast-container" aria-live="polite"></div>
+    <div id="toast-wrap" aria-live="polite"></div>
 
     <script src="app.js"></script>
 </body>
